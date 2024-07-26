@@ -1,0 +1,16 @@
+# this is a comment
+
+# ignore node_modules
+node_modules/
+
+# ignore local config files
+.vscode/ 
+.git/
+
+# ignore github stuff
+.gitignore
+README.md 
+
+# ignore testing files lol
+testvideo.html
+DockerCommands.md 
