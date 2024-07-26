@@ -1,9 +1,16 @@
 const express = require('express');
 const fs = require('fs');
 
-const app = express();
+// throw an error if the PORT environment variable DNE 
+if (!process.env.PORT) {
+    throw new Error("No environment variable named PORT. Please specify one so that we know the port number for the HTTP server.")
+}
 
-const port = 3000;
+// get the port number for PORT
+
+const port = process.env.PORT;
+
+const app = express();
 
 // for get requests to localhost:3000/  , send a response of "Hello, World!"
 app.get('/', (req, res) => {
@@ -25,6 +32,9 @@ app.get("/video", async (req, res) => {
     fs.createReadStream(vidPath).pipe(res);
 })
 
-// start server?
-app.listen(port);
+// start server with `npm start` (production mode) or `npm run start:dev` (developer mode)
+app.listen(port, () => {
+    console.log(`Microservice has begun listening on port ${port}, please point your browser to http://localhost:${port}/video`);
+});
 
+// for product deployment, run `npm install --omit=dev` to omit the installing of developer-only dependancies such as nodemon.
