@@ -1,5 +1,11 @@
 # copied from https://github.com/github/gitignore/blob/main/Node.gitignore
 
+# do not upload videos to github XD   the file size is too big (and the vids are possibly cringe???)
+videos/
+
+# random files that i made to test small browser things
+testvideo.html 
+
 # Logs
 logs
 *.log
