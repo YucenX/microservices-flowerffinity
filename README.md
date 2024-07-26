@@ -2,7 +2,7 @@
 
 This repo is dedicated to store most of the files that I create while learning from the ebook, *Bootstrapping Microservices (2nd edition) With Docker, Kubernetes, GitHub Actions, and Terraform* by **Ashley Davis**. I'm accessing this book through the Toronto Public Library via O'Reilly Learning.
 
-Apparently I'm going to end up making a video-streaming service using microservices...? Sounds cool, and I will hopefully develop some experience with Docker and Kubernetes in the process.
+Apparently I'm going to end up making a video-streaming service using microservices...? Sounds cool, and I will hopefully develop some experience with Docker and Kubernetes in the process. I will also be gaining experience with NodeJS and Javascript as a nice bonus, since I was planning on learning the two from a different book in the future. 
 
 ## Getting Started 
 
@@ -12,5 +12,5 @@ This book has also provided a link to all of the completed code examples shown i
 
 ### Prerequisites
 
-Please install Node.js and get a copy of the book if you want to follow along. 
+Please install Node.js and get a copy of the book if you want to follow along. Looks like we'll also need a bunch of other tools later down the line, so I'll keep you updated if I don't forget lol.
 
