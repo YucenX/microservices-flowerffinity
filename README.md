@@ -53,3 +53,8 @@ node <script>.js
 
 Please install Node.js and get a copy of the book if you want to follow along. Looks like we'll also need a bunch of other tools later down the line, so I'll keep you updated if I don't forget lol.
 
+## Chapter 3 Changes
+
+Instead of creating a private container registry with Microsoft Azure like David does in his book, I decided to leverage Github Container Registry instead. Although Microsoft Azure provides a free 12-month subscription when you sign up for the first time, I didn't feel comfortable with handling the subscription's free credits. Maybe later down the road I will feel more comfortable with all this Docker stuff, and I will inevidably switch to Azure for Kubernetes deployment. However, for now I will be sticking to 100% free-to-play options with no foreseeable end-of-subscription deadline.
+
+To set up a container registry with Github, I followed this link: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry. I think the documentation page is pretty self-explainatory, all I really need to do was set up a new personal access token (which I guess could be a little risky if the token gets leaked). Anyhow, the login process and so on is pretty analogous to what's in the book, just with different URLs and stuff; just follow the link above to publish a Docker Image and then return to the book. Ensure that you keep your token in an easy-to-remember place that is also super secure! More info can be found in `DockerCommands.md`
