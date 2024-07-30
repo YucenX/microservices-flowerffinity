@@ -67,7 +67,7 @@ Stop the container's execution using this command:
 ```sh
 docker stop container-id
 ```
-You should still be able to see your container if you run `docker container list --all` like before, but the `STATUS` coloumn will be different and the `PORTS` coloumn will be empty.
+You should still be able to see your container if you run `docker container list --all` like before, but the `STATUS` column will be different and the `PORTS` column will be empty.
 
 Finally, you can delete your container with this command:
 ```sh
@@ -121,4 +121,21 @@ docker run -d -p 3000:3000 -e PORT=3000 registry-url/image-name:version
 If you are using GitHub Container registry like me, then the registry URL and all that stuff will be the same as the ghcr.io link used to access your image on Github. So for me, I would have to run
 ```sh
 docker run -d -p 3000:3000 -e PORT=3000 ghcr.io/yucenx/microservices-flowerffinity:latest
+```
+
+## Running and Building En Masse
+
+Make sure that you have a `docker-compose.yml` set up properly...
+```sh
+docker compose up --build
+```
+
+Stopping our containers en-masse:
+```sh
+docker compose stop
+```
+
+Deleting/Removing our containers en-masse:
+```sh
+docker compose down --volumes
 ```

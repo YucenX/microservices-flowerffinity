@@ -1,0 +1,16 @@
+# version: '3'                          # v3 of docker compose format -- this line is not needed anymore according to some online forums 
+services:                             # this is just a name??
+
+  video-streaming:                    # config for video-streaming service
+    image: video-streaming            # name of our image 
+    build:                            # params for building:
+      context: ./video-streaming        # directory for the microservice
+      dockerfile: Dockerfile            # docker file for microservice 
+    container_name: video-streaming   # name of container that gets instantiated for our image
+    ports:                            # port mappings, like the -p flag
+     - "4000:80"                        # maps port 80 in the container to port 4000 in the host
+    environment:                      # the container's environment varibles, like -e flag
+      - PORT=80
+    restart: "no"                     # stops the microservice from restarting after crashing 
+
+# comment 
