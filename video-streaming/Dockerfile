@@ -4,6 +4,6 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci --omit=dev
 COPY ./src ./src 
-COPY ./videos ./videos
+# COPY ./videos ./videos     # no longer need to copy videos now that vids are in the cloud
 
 CMD npm start 

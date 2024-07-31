@@ -1,6 +1,29 @@
 # version: '3'                          # v3 of docker compose format -- this line is not needed anymore according to some online forums 
 services:                             # this is just a name??
 
+  db:     # this is a public MongoDB image from Docker Hub, so we don't need to build it ourselves 
+    image: mongo:7.0.12
+    container_name: db 
+
+    ports: 
+      - "4002:27017"
+    restart: "always"    # restart mongo if it crashes
+
+
+  azure-storage:
+    image: azure-storage 
+    build: 
+      context: azure-storage 
+      dockerfile: Dockerfile 
+    container_name: video-storage 
+    ports: 
+      - "4001:80"         # make sure u map unique ports from the dev computer to each microservice
+    environment:
+      - PORT=80
+      - STORAGE_ACCOUNT_NAME=${STORAGE_ACCOUNT_NAME}   # sets environment variables based on my dev computer's environment variables
+      - STORAGE_ACCESS_KEY=${STORAGE_ACCESS_KEY}
+    restart: "no"
+
   video-streaming:                    # config for video-streaming service
     image: video-streaming            # name of our image 
     build:                            # params for building:
@@ -8,9 +31,13 @@ services:                             # this is just a name??
       dockerfile: Dockerfile            # docker file for microservice 
     container_name: video-streaming   # name of container that gets instantiated for our image
     ports:                            # port mappings, like the -p flag
-     - "4000:80"                        # maps port 80 in the container to port 4000 in the host
+      - "4000:80"                        # maps port 80 in the container to port 4001 in the host
     environment:                      # the container's environment varibles, like -e flag
       - PORT=80
+      - VIDEO_STORAGE_HOST=video-storage   # links our two containers together
+      - VIDEO_STORAGE_PORT=80              # allows video-streaming to connect to video-storage
+      - DBHOST=mongodb://db:27017       # links this container with the database container
+      - DBNAME=video-streaming
     restart: "no"                     # stops the microservice from restarting after crashing 
 
 # comment 

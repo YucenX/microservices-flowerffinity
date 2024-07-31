@@ -1,41 +1,97 @@
-const express = require('express');
-const fs = require('fs');
+/*
+Make sure each microservice has its own database (if required). Do not
+share databases between microservices, as it leads to high coupling.
 
-// throw an error if the PORT environment variable DNE 
+*/
+
+const express = require("express");
+const http = require("http");
+const mongodb = require("mongodb");
+
+// Throws an error if the any required environment variables are missing.
 if (!process.env.PORT) {
-    throw new Error("No environment variable named PORT. Please specify one so that we know the port number for the HTTP server.")
+    throw new Error("Please specify the port number for the HTTP server with the environment variable PORT.");
 }
 
-// get the port number for PORT
+if (!process.env.VIDEO_STORAGE_HOST) {
+    throw new Error("Please specify the host name for the video storage microservice in variable VIDEO_STORAGE_HOST.");
+}
 
-const port = process.env.PORT;
+if (!process.env.VIDEO_STORAGE_PORT) {
+    throw new Error("Please specify the port number for the video storage microservice in variable VIDEO_STORAGE_PORT.");
+}
+
+if (!process.env.DBHOST) {
+    throw new Error("Please specify the databse host using environment variable DBHOST.");
+}
+
+if (!process.env.DBNAME) {
+    throw new Error("Please specify the name of the database using environment variable DBNAME");
+}
+
+// Extracts environment variables to globals for convenience.
+const PORT = process.env.PORT;
+const VIDEO_STORAGE_HOST = process.env.VIDEO_STORAGE_HOST;
+const VIDEO_STORAGE_PORT = parseInt(process.env.VIDEO_STORAGE_PORT);
+const DBHOST = process.env.DBHOST;  // database server host?
+const DBNAME = process.env.DBNAME;  // name of database microservice
+
+console.log(`Forwarding video requests to ${VIDEO_STORAGE_HOST}:${VIDEO_STORAGE_PORT}.`);
 
 const app = express();
 
-// for get requests to localhost:3000/  , send a response of "Hello, World!"
-app.get('/', (req, res) => {
-    res.send("Hello, World!");
-});
+// put stuff in a main function like java, C, C++, ..
+async function main() {
+    const client = await mongodb.MongoClient.connect(DBHOST); // Connects to the database.
+    const db = client.db(DBNAME);
+    const videosCollection = db.collection("videos");
+    
+    const app = express();
+        
+    // http get handler
+    app.get("/video", async (req, res) => {
+        // get video id from http query, and search database for a video with the matching id
+        const videoId = new mongodb.ObjectId(req.query.id);
+        const videoRecord = await videosCollection.findOne({ _id: videoId });
+        if (!videoRecord) {
+            // The video was not found.
+            res.sendStatus(404);
+            return;
+        }
 
-// get requests to localhost:3000/video
-app.get("/video", async (req, res) => {
-    const vidPath = "./videos/intro 2021 - near end.mp4"; 
-    const stats = await fs.promises.stat(vidPath);
+        console.log(`Translated id ${videoId} to path ${videoRecord.videoPath}.`);
 
-    // write the response head, which includes video format and size
-    res.writeHead(200, {
-        "content-length": stats.size,
-        "content-type": "video/mp4"
+        const forwardRequest = http.request( // Forward the request to the video storage microservice.
+            {
+                host: VIDEO_STORAGE_HOST,
+                port: VIDEO_STORAGE_PORT,
+                path:`/video?path=${videoRecord.videoPath}`, // Video path now retrieved from the database.
+                method: 'GET',
+                headers: req.headers
+            }, 
+            forwardResponse => {
+                res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+                forwardResponse.pipe(res);
+            }
+        );
+        
+        req.pipe(forwardRequest);
     });
 
-    // open a stream to read the vid, and pipe the read data to our response
-    fs.createReadStream(vidPath).pipe(res);
-})
+    //
+    // Starts the HTTP server.
+    //
+    app.listen(PORT, () => {
+        console.log(`Microservice listening, please load the data file db-fixture/videos.json into your database before testing this microservice.`);
+    });
+}
 
-// start server with `npm start` (production mode) or `npm run start:dev` (developer mode)
-app.listen(port, () => {
-    console.log(`Microservice has begun listening on port ${port}, please point your browser to http://localhost:${port}/video`);
-});
+main()
+    .catch(err => {
+        console.error("Microservice failed to start.");
+        console.error(err && err.stack || err);
+    });
+// this is some ugly javascript code
 
 // for product deployment, run `npm install --omit=dev` to omit the installing of developer-only dependancies such as nodemon.
 
