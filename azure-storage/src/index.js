@@ -78,4 +78,5 @@ app.get("/video", async (req, res) => {
 // Starts the HTTP server.
 app.listen(PORT, () => {
     console.log(`Microservice online`);
+    console.log(`C++`);
 });

@@ -40,6 +40,38 @@ console.log(`Forwarding video requests to ${VIDEO_STORAGE_HOST}:${VIDEO_STORAGE_
 
 const app = express();
 
+// Send the "viewed" to the history microservice.
+function sendViewedMessage(videoPath) {
+    const postOptions = { // Options to the HTTP POST request.
+        method: "POST", // Sets the request method as POST.
+        headers: {
+            "Content-Type": "application/json", // Sets the content type for the request's body.
+        },
+    };
+
+    const requestBody = { // Body of the HTTP POST request, JSON style
+        videoPath: videoPath 
+    };
+
+    const req = http.request( // Send the "viewed" message to the history microservice.
+        "http://history/viewed",
+        postOptions
+    );
+
+    req.on("close", () => { // upon request close, inform console
+        console.log("Sent 'viewed' message to history microservice.");
+    });
+
+    req.on("error", (err) => { // upon request error, inform console
+        console.error("Failed to send 'viewed' message!");
+        console.error(err && err.stack || err);
+    });
+
+    req.write(JSON.stringify(requestBody)); // Write the body to the request.
+    req.end(); // End the request.
+}
+
+
 // put stuff in a main function like java, C, C++, ..
 async function main() {
     const client = await mongodb.MongoClient.connect(DBHOST); // Connects to the database.
@@ -74,6 +106,8 @@ async function main() {
                 forwardResponse.pipe(res);
             }
         );
+
+        sendViewedMessage(videoRecord.videoPath);
         
         req.pipe(forwardRequest);
     });
@@ -83,6 +117,7 @@ async function main() {
     //
     app.listen(PORT, () => {
         console.log(`Microservice listening, please load the data file db-fixture/videos.json into your database before testing this microservice.`);
+        console.log(`now's your chance to be a [[BIG SHOT]]!`);
     });
 }
 

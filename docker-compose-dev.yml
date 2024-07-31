@@ -1,4 +1,7 @@
-# version: '3'                          # v3 of docker compose format -- this line is not needed anymore according to some online forums 
+# this docker-compose file is for development mode
+# use this docker-compose file with this command
+#    docker compose  -f docker-compose-dev.yml up --build
+
 services:                             # this is just a name??
 
   history:
@@ -15,6 +18,8 @@ services:                             # this is just a name??
     environment:
       - PORT=80
       - NODE_ENV=development
+      - DBHOST=mongodb://db:27017       # links this container with the database container
+      - DBNAME=history
     restart: "no"
 
   db:     # this is a public MongoDB image from Docker Hub, so we don't need to build it ourselves 
@@ -30,8 +35,11 @@ services:                             # this is just a name??
     image: azure-storage 
     build: 
       context: azure-storage 
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile-dev
     container_name: video-storage 
+    volumes:
+      - /tmp/azure-storage/npm-cache:/root/.npm:z
+      - ./azure-storage/src:/usr/src/app/src:z 
     ports: 
       - "4001:80"         # make sure u map unique ports from the dev computer to each microservice
     environment:
@@ -44,8 +52,11 @@ services:                             # this is just a name??
     image: video-streaming            # name of our image 
     build:                            # params for building:
       context: ./video-streaming        # directory for the microservice
-      dockerfile: Dockerfile            # docker file for microservice 
+      dockerfile: Dockerfile-dev            # docker file for microservice 
     container_name: video-streaming   # name of container that gets instantiated for our image
+    volumes:
+      - /tmp/video-streaming/npm-cache:/root/.npm:z
+      - ./video-streaming/src:/usr/src/app/src:z
     ports:                            # port mappings, like the -p flag
       - "4000:80"                        # maps port 80 in the container to port 4000 in the host
     environment:                      # the container's environment varibles, like -e flag

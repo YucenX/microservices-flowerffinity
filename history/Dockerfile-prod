@@ -1,0 +1,12 @@
+FROM node:20.14.0
+# now we will be splitting Dockerfiles for production and for development
+
+# if you are using vscode, you may need to set some file associations for
+# syntax checking and highlighting to appear on these custom Dockerfiles
+
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY ./src ./src
+
+CMD npm start
