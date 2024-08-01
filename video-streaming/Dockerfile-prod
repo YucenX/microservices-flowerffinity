@@ -6,4 +6,6 @@ RUN npm ci --omit=dev
 COPY ./src ./src 
 # COPY ./videos ./videos     # no longer need to copy videos now that vids are in the cloud
 
-CMD npm start 
+# wait for rabbit to start
+CMD npx wait-port rabbit:5672 && \
+    npm start 

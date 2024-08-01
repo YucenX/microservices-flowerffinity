@@ -2,7 +2,15 @@
 # use this docker-compose file with this command
 #    docker compose  -f docker-compose-dev.yml up --build
 
-services:                             # this is just a name??
+services:                            
+
+  rabbit:   # rabbit mq server for indirect messaging between microservices
+    image: rabbitmq:3.13.6-management
+    container_name: rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: "always"
 
   history:
     image: history 
@@ -20,14 +28,19 @@ services:                             # this is just a name??
       - NODE_ENV=development
       - DBHOST=mongodb://db:27017       # links this container with the database container
       - DBNAME=history
+      - RABBIT=amqp://guest:guest@rabbit:5672  # URI for our RabbitMQ server, with username and password encoded in the URI
+    depends_on:  # this section forces this microservice to delay starting until these other microservices have fully started
+      - db 
+      - rabbit  
     restart: "no"
 
   db:     # this is a public MongoDB image from Docker Hub, so we don't need to build it ourselves 
     image: mongo:7.0.12
     container_name: db 
-
     ports: 
       - "4002:27017"
+    volumes:  # maps our mongodb initialization script to the container's initialization script.
+      - ./learning-notes/init_mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     restart: "always"    # restart mongo if it crashes
 
 
@@ -65,6 +78,10 @@ services:                             # this is just a name??
       - VIDEO_STORAGE_PORT=80              # allows video-streaming to connect to video-storage
       - DBHOST=mongodb://db:27017       # links this container with the database container
       - DBNAME=video-streaming
+      - RABBIT=amqp://guest:guest@rabbit:5672
+    depends_on:
+      - db 
+      - rabbit
     restart: "no"                     # stops the microservice from restarting after crashing 
 
 # comment 

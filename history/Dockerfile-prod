@@ -9,4 +9,6 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 COPY ./src ./src
 
-CMD npm start
+# wait for rabbit to start
+CMD npx wait-port rabbit:5672 && \
+    npm start 

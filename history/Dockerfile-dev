@@ -6,4 +6,6 @@ COPY package*.json ./
 
 # install dependancies from the cache and start the program in dev mode 
 CMD npm install --prefer-offline && \
+    npx wait-port rabbit:5672 && \
     npm run start:dev
+# wait for rabbit to start

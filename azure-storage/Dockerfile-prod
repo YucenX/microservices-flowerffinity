@@ -1,5 +1,7 @@
 FROM node:20.14.0
 # i just copied from the video-streaming docker file, even though on David's Github the commands are slightly different...
+
+# DOCKER PROD for AZURE STORAGE
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci --omit=dev

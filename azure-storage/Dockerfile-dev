@@ -1,5 +1,7 @@
 FROM node:20.14.0
 
+# DOCKER DEV for AZURE STORAGE
+
 WORKDIR /usr/src/app
 COPY package*.json ./  
 

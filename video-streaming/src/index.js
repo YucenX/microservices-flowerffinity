@@ -1,12 +1,14 @@
 /*
 Make sure each microservice has its own database (if required). Do not
 share databases between microservices, as it leads to high coupling.
-
+You can have multiple databases on the same server though, it's just that
+each database is separate from each other.
 */
 
 const express = require("express");
 const http = require("http");
 const mongodb = require("mongodb");
+const amqp = require('amqplib');
 
 // Throws an error if the any required environment variables are missing.
 if (!process.env.PORT) {
@@ -29,19 +31,22 @@ if (!process.env.DBNAME) {
     throw new Error("Please specify the name of the database using environment variable DBNAME");
 }
 
+if (!process.env.RABBIT) {
+    throw new Error("Please specify the name of the RabbitMQ host using environment variable RABBIT");
+}
+
 // Extracts environment variables to globals for convenience.
 const PORT = process.env.PORT;
 const VIDEO_STORAGE_HOST = process.env.VIDEO_STORAGE_HOST;
 const VIDEO_STORAGE_PORT = parseInt(process.env.VIDEO_STORAGE_PORT);
 const DBHOST = process.env.DBHOST;  // database server host?
 const DBNAME = process.env.DBNAME;  // name of database microservice
+const RABBIT = process.env.RABBIT;
 
 console.log(`Forwarding video requests to ${VIDEO_STORAGE_HOST}:${VIDEO_STORAGE_PORT}.`);
 
-const app = express();
-
 // Send the "viewed" to the history microservice.
-function sendViewedMessage(videoPath) {
+function sendViewedMessageDirect(videoPath) {
     const postOptions = { // Options to the HTTP POST request.
         method: "POST", // Sets the request method as POST.
         headers: {
@@ -59,11 +64,11 @@ function sendViewedMessage(videoPath) {
     );
 
     req.on("close", () => { // upon request close, inform console
-        console.log("Sent 'viewed' message to history microservice.");
+        console.log("DIRECT: Sent and received 'viewed' message to history microservice.");
     });
 
     req.on("error", (err) => { // upon request error, inform console
-        console.error("Failed to send 'viewed' message!");
+        console.error("DIRECT: Failed to send 'viewed' message!");
         console.error(err && err.stack || err);
     });
 
@@ -77,8 +82,29 @@ async function main() {
     const client = await mongodb.MongoClient.connect(DBHOST); // Connects to the database.
     const db = client.db(DBNAME);
     const videosCollection = db.collection("videos");
-    
     const app = express();
+
+    console.log(`Connecting to RabbitMQ server at ${RABBIT}.`);
+
+    const messagingConnection = await amqp.connect(RABBIT); // Connects to the RabbitMQ server.
+
+    console.log("Connected to RabbitMQ.");
+
+    const messageChannel = await messagingConnection.createChannel(); // Creates a RabbitMQ messaging channel.
+
+    // assert the existance of the exchange
+    await messageChannel.assertExchange("viewed", "fanout");
+
+        //
+        // Send the "viewed" to the history microservice.
+        //
+        function sendViewedMessageIndirect(messageChannel, videoPath) {
+            console.log(`INDIRECT: Publishing message on "viewed" queue.`);
+            const msg = { videoPath: videoPath };  // define our JSON payload
+            const jsonMsg = JSON.stringify(msg);
+            messageChannel.publish("viewed", "", Buffer.from(jsonMsg)); // Publishes message to the "viewed" queue.
+        }
+
         
     // http get handler
     app.get("/video", async (req, res) => {
@@ -107,7 +133,8 @@ async function main() {
             }
         );
 
-        sendViewedMessage(videoRecord.videoPath);
+        sendViewedMessageDirect(videoRecord.videoPath);
+        sendViewedMessageIndirect(messageChannel, videoRecord.videoPath);
         
         req.pipe(forwardRequest);
     });
