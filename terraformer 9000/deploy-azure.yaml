@@ -1,0 +1,42 @@
+# For use with Azure
+# kubectl apply -f deploy-azure.yaml
+# kubectl delete -f deploy-azure.yaml
+
+apiVersion: apps/v1
+kind: Deployment    # deployment mode - keeps microservice alive, restarts automatically if crash
+metadata:
+  name: deltarune-video   # name of the deployment
+spec:
+  replicas: 1     # only keep a single copy running. you can increase this number for load-balancing, redundancy, and other stuff
+  selector:
+    matchLabels:
+      app: deltarune-video    # a name to link together the deployment, pod, and service
+  template:     # template for our pod?
+    metadata:
+      labels:
+        app: deltarune-video
+    spec:
+      containers: 
+      - name: deltarune-video
+        image: absolution.azurecr.io/deltarune-video:2    # gets image from my azure container registry
+        imagePullPolicy: IfNotPresent        # pulls image from container registry if not already present in kube cluster
+        env:        # sets environment variables
+        - name: PORT
+          value: "4000"
+
+---     # splits out config file into two? section divider of some sorts
+
+apiVersion: v1
+kind: Service   # service mode - creates a DNS record and exposes our microservice to HTTP requests
+metadata:
+  name: deltarune-video     # name of service
+spec:
+  selector:
+    app: deltarune-video
+  type: LoadBalancer      # makes this microservice accessible by the rest of the world
+  ports:                  # warning: anyone can access this microservice without authetication!! even hackers!!
+    - protocol: TCP
+      port: 80
+      targetPort: 4000    # maps this container's port 4000 to port 30k on your dev computer
+
+
