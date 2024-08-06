@@ -2,6 +2,7 @@
 # The simplest possible GitHub Actions workflow.
 #
 
+# this name will appear as the name of the "Job" on Github
 name: Hello world
 
 on:
@@ -28,6 +29,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+        # note: I changed the checkout version to v4 and it still works
 
       # Names our "step" and runs our "Hello world" shell script.
       - name: Runs the "Hello world" shell script
@@ -42,6 +44,9 @@ jobs:
             echo "I will now be executing the ls command on the root directory..."
             ls -all
             echo "Did you enjoy that?"
+            cd ./deltarune-video
+            cat package.json
+            echo "I should go to sleep"
 
     #  of course, sometimes it's still better to organize your commands in separate sh files, rather than 
     #  using inline commands (especially with variables and conditionals)
