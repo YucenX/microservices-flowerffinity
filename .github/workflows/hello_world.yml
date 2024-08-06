@@ -1,0 +1,49 @@
+#
+# The simplest possible GitHub Actions workflow.
+#
+
+name: Hello world
+
+on:
+  #
+  # Triggers this workflow on push to the main branch of this code repository.
+  #
+  push: 
+    branches:
+      - main
+
+  #
+  # Allows deployment to be invoked manually through the GitHub Actions user interface.
+  #
+  workflow_dispatch: 
+  
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "hello-world"
+  hello-world:
+    # The type of runner that the job will run on (this one will run on Linux)
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Names our "step" and runs our "Hello world" shell script.
+      - name: Runs the "Hello world" shell script
+        run: ./cd_pipeline/hello_world.sh
+
+        # other things that you can do (outside of hello world)
+      - name: Step 2 of Hello World YAML  # you can define additional steps like this
+        run: echo "You can insert commands right into the YAML file too!"
+
+      - name: Step 3 - This is a multiline command
+        run: |          # use the | character to indicate a sequence of inline commands like this:
+            echo "I will now be executing the ls command on the root directory..."
+            ls -all
+            echo "Did you enjoy that?"
+
+    #  of course, sometimes it's still better to organize your commands in separate sh files, rather than 
+    #  using inline commands (especially with variables and conditionals)
+
+# EOF
