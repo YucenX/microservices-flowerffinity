@@ -34,9 +34,19 @@ app.get("/oldvid", async (req, res) => {
 });
 
 
-//
-// Starts the HTTP server.
-//
-app.listen(PORT, () => {
-    console.log(`Microservice online.`);
-});
+// for testing purposes, we have separate "main" functions
+if (require.main === module) {
+    //
+    // When this script is run as the entry point, starts the HTTP server.
+    //
+    app.listen(PORT, () => {
+        console.log(`Microservice online.`);
+    });
+} else {
+    //
+    // Otherwise, exports the express app object for use in tests.
+    //
+    module.exports = {
+        app,
+    };
+}

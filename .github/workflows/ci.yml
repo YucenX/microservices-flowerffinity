@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  #
+  # Runs tests against the microservice on push to the main branch of this code repository.
+  #
+  push: 
+    branches:
+      - main
+
+  #
+  # Allows deployment to be invoked manually through the GitHub Actions user interface.
+  #
+  workflow_dispatch: 
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - uses: actions/checkout@v4
+
+    # 
+    # Installs Node.js for use in the workflow.
+    #
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+
+    - run: npm ci
+    - run: npm test
+    
