@@ -3,7 +3,7 @@ FROM node:20.14.0
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci --omit=dev
-COPY ./src ./src
+COPY ./src/index.js ./src/index.js
 COPY ./videos/berdly_balls_on_kris.mp4 ./videos/berdly_balls_on_kris.mp4  
 
 CMD npm start
