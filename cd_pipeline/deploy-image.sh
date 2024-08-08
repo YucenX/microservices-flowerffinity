@@ -22,3 +22,7 @@ set -u # or set -o nounset
 # kubeclt to read its "config file" from stdin 
 envsubst < ./cd_pipeline/deploy-cd.yaml | kubectl apply -f -
 
+# note for windows wsl users: your Kube config in WSL is different from 
+# the Kube config in your Windows filesystem! so if you try to compute
+# the base 64 hash of ~/.../kubeconfig, you'll actually be hashing
+# the Linux config instead of the Windows one, which might not be the same file!

@@ -13,3 +13,7 @@ Make sure that you mark your shell scripts as executable in the Git repo! Otherw
 ```sh
 git update-index --chmod=+x <path-to-the-script-file>
 ```
+
+Additionally, make sure you upload your video to Github to avoid HTTP status 500 on the testing environment. 
+
+We will be directly deploying our code from the main branch for simplicity, but in reality this is bad practice - as said in the book. You should instead have a separate production branch that has CD enabled and a bunch of dev branches with CI enabled (but not CD).
