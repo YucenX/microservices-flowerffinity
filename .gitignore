@@ -1,7 +1,8 @@
 # copied from https://github.com/github/gitignore/blob/main/Node.gitignore
 
 # do not upload videos to github XD   the file size is too big (and the vids are possibly cringe???)
-videos/
+# nvm i need to add (some of) them to the repo for Github Actions to work
+**/videos/twilight_sparkle.mp4
 
 # random files that i made to test small browser things
 testvideo.html 
