@@ -28,6 +28,9 @@ jobs:
       with:
         node-version: 20.x
         cache: 'npm'
-    - run: cd ./deltarune-video/
-    - run: npm ci
-    - run: npm test
+        
+    - name: Run Javascript tests
+      run: |
+        cd ./deltarune-video/
+        npm ci
+        npm test
