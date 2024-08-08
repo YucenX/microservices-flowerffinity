@@ -32,7 +32,8 @@ jobs:
       #working-directory: ./deltarune-video/
       with:
         node-version: 20.x
-        #cache: 'npm'
+        cache: 'npm'
+        cache-dependency-path: ./deltarune-video/package-lock.json
       
 
     - name: Install dependencies
