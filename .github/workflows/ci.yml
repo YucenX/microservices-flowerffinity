@@ -19,18 +19,24 @@ jobs:
 
     steps:
     
-    - uses: actions/checkout@v4
+    # some of this code has been taken from ChatGPT's output because I'm letting Github Actions
+    # run tests against my entire repo instead of just a single microservice (which is what the book does)
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     # 
-    # Installs Node.js for use in the workflow.
+    # Installs Node.js for use in the workflow. Note: uses a different action than checking out the code!
     #
-    - uses: actions/setup-node@v4
+    - name: Set up NodeJS
+      uses: actions/setup-node@v3
       with:
         node-version: 20.x
         cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+      working-directory: ./deltarune-video/
         
-    - name: Run Javascript tests
-      run: |
-        cd ./deltarune-video/
-        npm ci
-        npm test
+    - name: Run tests
+      run: npm test
+      working-directory: ./deltarune-video/
