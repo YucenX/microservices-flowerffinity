@@ -1,0 +1,13 @@
+services:
+  db:
+    image: mongo:7.0.0
+    container_name: db 
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    restart: always
+
+# cd ".\automated testing\integration tests"
+# docker compose -f '.\docker compose.yml' up
+# docker compose -f '.\docker compose.yml' down
